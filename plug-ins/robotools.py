@@ -7,12 +7,13 @@ import pymel.util
 import platform
 
 from maya import mel
+from pymel.core import Path
 
 
-ROBOTOOLS_FOLDER = os.path.join(os.path.expanduser('~'), 'Dropbox/Technology/Python2/MayaPython27')
-ROBOTOOLS_SCRIPTS = os.path.join(ROBOTOOLS_FOLDER, 'scripts')
-SITE_PACKAGES = os.path.join(ROBOTOOLS_FOLDER, 'site-packages')
-ROBOTOOLS_PLUG_INS = os.path.join(ROBOTOOLS_FOLDER, 'plug-ins')
+ROBOTOOLS_FOLDER = Path(os.path.expanduser('~')).joinpath('Dropbox/Technology/Python2/MayaPython27')
+ROBOTOOLS_SCRIPTS = ROBOTOOLS_FOLDER.joinpath('scripts')
+SITE_PACKAGES = ROBOTOOLS_FOLDER.joinpath('site-packages')
+ROBOTOOLS_PLUG_INS = ROBOTOOLS_FOLDER.joinpath('plug-ins')
 ENVIRONMENT_PATHS = {
     'PYTHONPATH': [ROBOTOOLS_SCRIPTS, SITE_PACKAGES],
     'MAYA_PLUG_IN_PATH': [ROBOTOOLS_PLUG_INS],
@@ -88,6 +89,9 @@ def bootstrap():
         environment_values = list(set(environment_values))
         environment_values.sort(key=lambda x: x.lower())
         set_environment_variable(env_key, environment_values)
+
+    from maya_tools import shelf_manager
+    shelf_manager.setup_robotools_shelf()
 
 
 def get_environment_variable(variable_name):

@@ -1,7 +1,7 @@
 import pymel.core as pm
 
 
-from node_enums import Axis
+from core_tools.enums import Axis
 
 
 def mirror(nodes=None, axis=Axis.x, positive=False, merge_threshold=0.001):
@@ -37,10 +37,10 @@ def mirror(nodes=None, axis=Axis.x, positive=False, merge_threshold=0.001):
     pm.select(selection)
 
 
-
-def slice(nodes=None, axis=Axis.x, positive=True):
+def slice_geometry(nodes=None, axis=Axis.x, positive=True):
     """
     Slices geometry along an axis
+    :param nodes:
     :param axis: Specify geometric axis
     :param positive: Specify positive or negative axis
     """
