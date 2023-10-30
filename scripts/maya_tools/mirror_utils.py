@@ -4,7 +4,7 @@ import pymel.core as pm
 from core_tools.enums import Axis
 
 
-def mirror(nodes=None, axis=Axis.x, positive=False, merge_threshold=0.001):
+def mirror_geometry(nodes=None, axis=Axis.x, positive=False, merge_threshold=0.001):
     """
     Mirrors geometry along an axis
     :param nodes: Supply nodes
@@ -23,16 +23,8 @@ def mirror(nodes=None, axis=Axis.x, positive=False, merge_threshold=0.001):
     for item in nodes:
         pm.select(item)
         pivot_position = [pm.xform(item, query=True, piv=True, ws=True)[i] for i in range(3)]
-        slice(item, axis, not positive)
-        pm.polyMirrorFace(
-            item, 
-            ws=True, 
-            d=direction[axis], 
-            mergeMode=1, 
-            p=pivot_position, 
-            mt=merge_threshold, 
-            mtt=1
-        )
+        slice_geometry(item, axis, not positive)
+        pm.polyMirrorFace(item,  ws=True, d=direction[axis], mergeMode=1, p=pivot_position, mt=merge_threshold, mtt=1)
     
     pm.select(selection)
 

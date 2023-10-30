@@ -1,7 +1,10 @@
 import os
 import sys
 import subprocess
+import platform
+
 from maya_tools.paths import MAYA_REQUIREMENTS, SITE_PACKAGES
+from maya import mel
 
 
 def get_maya_python_interpreter_path():
