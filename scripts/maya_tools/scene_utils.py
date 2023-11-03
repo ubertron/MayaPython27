@@ -41,8 +41,7 @@ def import_model(import_path):
     Imports a file
     @param import_path:
     """
-    nodes = pm.importFile(import_path, returnNewNodes=True)
-    return nodes
+    return pm.importFile(import_path, returnNewNodes=True)
 
 
 def load_scene(file_path, force=True):
@@ -51,8 +50,7 @@ def load_scene(file_path, force=True):
     @param file_path:
     @param force:
     """
-    assert file_path.exists(), 'Path does not exist.'
-    pm.system.openFile(file_path.as_posix(), force=force)
+    return pm.system.openFile(file_path, force=force, returnNewNodes=True)
 
 
 def save_scene(force=False):
@@ -64,7 +62,7 @@ def save_scene(force=False):
     """
     scene_path = get_scene_path()
 
-    if scene_path.as_posix() == '.':
+    if scene_path == '.':
         return False
 
     try:
@@ -83,9 +81,11 @@ def create_reference(file_path, force=False):
     @return: pm.system.FileReference
     """
     assert file_path.exists()
+
     if force:
         pm.system.newFile(force=True)
-    return pm.system.createReference(file_path.as_posix())
+
+    return pm.system.createReference(file_path)
 
 
 class State:
@@ -94,6 +94,7 @@ class State:
     def __init__(self):
         self.component_mode = get_component_mode()
         self.selection = pm.ls(sl=True)
+
         if self.object_mode:
             self.object_selection = pm.ls(sl=True)
             self.component_selection = []
@@ -114,6 +115,7 @@ class State:
         else:
             set_component_mode(ComponentType.object)
             pm.select(clear=True)
+
         if not self.object_mode:
             pm.select(self.component_selection)
 
@@ -181,7 +183,9 @@ def create_group_node(name, overwrite=False):
     """
     if pm.objExists(name) and overwrite:
         pm.delete(name)
+
     group_node = pm.group(name=name, empty=True)
+
     return group_node
 
 

@@ -3,7 +3,7 @@ import sys
 import subprocess
 import platform
 
-from maya_tools.paths import MAYA_REQUIREMENTS, SITE_PACKAGES
+from maya_tools import MAYA_REQUIREMENTS, SITE_PACKAGES
 from maya import mel
 
 

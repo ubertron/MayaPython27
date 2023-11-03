@@ -1,3 +1,2 @@
-Set the path in the Maya.env ot wherever the modules folder is.
-Place the Maya.env into prefs folder.
-The specified modules set up the environment paths.
+Setup Instructions
+Set MAYA_PLUG_IN_PATH to the modules folder location in Maya.env
