@@ -203,3 +203,12 @@ def get_top_level_transforms():
     :@return: Finds transforms that are children of the world
     """
     return [x for x in pm.ls(transforms=True) if not pm.listRelatives(x, parent=True)]
+
+
+def message_script(text):
+    """
+    Creates a script which launches an in-view message
+    @param text:
+    @return:
+    """
+    return 'import pymel.core as pm\npm.inViewMessage(assistMessage="{}", fade=True, pos="midCenter")'.format(text)

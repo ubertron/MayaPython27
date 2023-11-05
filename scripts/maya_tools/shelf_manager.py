@@ -127,12 +127,3 @@ def build_shelf_command(function, script, imports=None):
     return '{}{}\n\n{}'.format(import_string, inspect.getsource(function), script)
 
 
-def message_script(text):
-    """
-    Creates a script which launches an in-view message
-    @param text:
-    @return:
-    """
-    return 'import pymel.core as pm\npm.inViewMessage(assistMessage="{}", fade=True, pos="midCenter")'.format(text)
-
-

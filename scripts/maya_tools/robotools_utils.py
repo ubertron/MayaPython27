@@ -7,7 +7,8 @@ import logging
 from pymel.core.system import Path
 
 from maya_tools import icon_path
-from maya_tools.shelf_manager import ShelfManager, message_script
+from maya_tools.shelf_manager import ShelfManager
+from maya_tools.scene_utils import message_script
 
 ROBOTOOLS_SHELF_NAME = 'Robotools'
 ROBOTOOLS_SHELF_VERSION = '1.1'
@@ -36,6 +37,8 @@ def setup_robotools_shelf():
     mirror_cmd = 'from maya_tools.mirror_utils import mirror_geometry\nmirror_geometry()'
     quadrangulate = 'import pymel.core as pm\npm.runtime.Quadrangulate()'
     merge_vertices = 'from maya_tools.geometry_utils import merge_vertices\nmerge_vertices'
+    select_triangles = 'from maya_tools import geometry_utils; geometry_utils.get_triangular_faces(select=True)'
+    select_ngons = 'from maya_tools import geometry_utils; geometry_utils.get_ngons(select=True)'
 
     sm.add_shelf_button(label='About Robotools', icon=robonobo_icon, command=message_script(version_info))
     sm.add_separator()
@@ -48,6 +51,8 @@ def setup_robotools_shelf():
     sm.add_shelf_button(label='Mirror', icon=icon_path('mirror.png'), command=mirror_cmd)
     sm.add_shelf_button(label='Quadrangulate', overlay_label='Quad', icon=script_icon, command=quadrangulate)
     sm.add_shelf_button(label='Merge Vertices', overlay_label='Merge', icon=script_icon, command=merge_vertices)
+    sm.add_shelf_button(label='Select Triangles', overlay_label='Tris', icon=script_icon, command=select_triangles)
+    sm.add_shelf_button(label='Select Ngons', overlay_label='Ngons', icon=script_icon, command=select_ngons)
 
 
 def delete_robotools_shelf():

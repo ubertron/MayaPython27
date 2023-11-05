@@ -37,7 +37,6 @@ def slice_geometry(nodes=None, axis=Axis.x, positive=True):
     :param positive: Specify positive or negative axis
     """
     selection = pm.ls(sl=True)
-    print(selection)
     nodes = pm.ls(nodes) if nodes else pm.ls(sl=True, tr=True)
     angles = {
         Axis.x: [0, positive * 180 - 90, 0],
