@@ -73,11 +73,25 @@ def bootstrap():
     from maya_tools import robotools_utils
 
     robotools_utils.setup_robotools_shelf()
+    hotkey_manager = robotools_utils.RobotoolsHotkeyManager()
+
+    if hotkey_manager.exists:
+        logging.info('>>>> Hotkeys imported')
+        hotkey_manager.import_set()
+    else:
+        logging.info('>>>> Hotkey preferences file created')
+        hotkey_manager.init_hotkeys()
+        hotkey_manager.export_set()
 
 
 def teardown():
     """
     Reverse the bootstrapping to unload the plug-in
     """
-    from maya_tools import shelf_manager
-    maya_tools.robotools_utils.delete_robotools_shelf()
+    from maya_tools import shelf_manager, robotools_utils
+
+    robotools_utils.delete_robotools_shelf()
+    logging.info('>>>> Removing Robotools Shelf')
+    robotools_utils.RobotoolsHotkeyManager().delete_set()
+    logging.info('>>>> Deleting Robotools Hotkeys')
+

@@ -6,10 +6,13 @@ import logging
 
 from pymel.core.system import Path
 
-from maya_tools import icon_path
-from maya_tools.shelf_manager import ShelfManager
+from maya_tools import icon_path, shelf_manager, hotkey_utils
 from maya_tools.scene_utils import message_script
 
+from core_tools import PROJECT_ROOT
+
+ROBOTOOLS_TITLE = 'RobotoolsHotkeys'
+ROBOTOOLS_HOTKEYS = PROJECT_ROOT.joinpath('scripts', 'startup', '{}.mhk'.format(ROBOTOOLS_TITLE))
 ROBOTOOLS_SHELF_NAME = 'Robotools'
 ROBOTOOLS_SHELF_VERSION = '1.1'
 ROBOTOOLS_SHELF_PLUG_IN = 'robotools_shelf'
@@ -20,8 +23,8 @@ def setup_robotools_shelf():
     """
     Sets up the Robotools shelf
     """
-    logging.info('>>>>>>>>>>>>>>> Loading Robotools Shelf')
-    sm = ShelfManager(ROBOTOOLS_SHELF_NAME)
+    logging.info('>>>> Loading Robotools Shelf')
+    sm = shelf_manager.ShelfManager(ROBOTOOLS_SHELF_NAME)
     sm.delete()
     sm.create(select=True)
     sm.delete_buttons()
@@ -59,5 +62,24 @@ def delete_robotools_shelf():
     """
     Remove the shelf
     """
-    logging.info('>>>>>>>>>>>>>>> Removing Robotools Shelf')
-    ShelfManager(ROBOTOOLS_SHELF_NAME).delete()
+    shelf_manager.ShelfManager(ROBOTOOLS_SHELF_NAME).delete()
+
+
+class RobotoolsHotkeyManager(hotkey_utils.HotkeyManager):
+    def __init__(self):
+        super(RobotoolsHotkeyManager, self).__init__(name=ROBOTOOLS_TITLE, path=ROBOTOOLS_HOTKEYS)
+
+    def init_hotkeys(self):
+        """
+        Set up the hotkeys
+        """
+        self.set_hotkey('hotkeyPrefs', annotation='Mirror Geometry', mel_command='HotkeyPreferencesWindow',
+                        key='H', cmd=True, ctrl=True, overwrite=True)
+        self.set_hotkey('appendToPoly', annotation='Append To Poly', mel_command='AppendToPolygonTool',
+                        key='A', cmd=True, overwrite=True)
+        self.set_hotkey('createPoly', annotation='Create Polygon Tool', mel_command='CreatePolygonTool',
+                        key='C', cmd=True, overwrite=True)
+        self.set_hotkey('combine', annotation='Combine', mel_command='CombinePolygons',
+                        key='A', ctrl=True, alt=True, overwrite=True)
+        self.set_hotkey('mergeVertices', annotation='Merge Vertices', mel_command='PolyMergeVertices',
+                        key='W', cmd=True, overwrite=True)
