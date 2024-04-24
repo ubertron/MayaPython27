@@ -1,16 +1,21 @@
 import os
+import shutil
 import sys
 import maya.api.OpenMaya as om
 import logging
 import pymel.util
 import platform
+import subprocess
 
 from maya import mel
 from pymel.core import Path
 
 import maya_tools.robotools_utils
 
-PLATFORM_SEPARATOR = ':' if platform.system() == 'Darwin' else ';'
+from core_tools import SITE_PACKAGES, REQUIREMENTS, MAYA_INTERPRETER_PATH
+
+DARWIN = 'Darwin'
+PLATFORM_SEPARATOR = ':' if platform.system() == DARWIN else ';'
 
 
 def maya_useNewAPI():
@@ -42,7 +47,7 @@ def initializePlugin(plugin):
     @param plugin:
     """
     vendor = 'Robonobo'
-    version = '1.0.1'
+    version = '1.1'
     pluginFn = om.MFnPlugin(plugin, vendor, version)
 
     try:
@@ -63,7 +68,7 @@ def uninitializePlugin(plugin):
         teardown()
         pluginFn.deregisterCommand(RobotoolsShelfInitializeCmd.kPluginCmdName)
     except RuntimeError:
-        raise RuntimeError('Failed to unregister command: %s\n' % RobotoolsShelfInitializeCmd.kPluginCmdName)
+        raise RuntimeError('Failed to unregister command: {}\n'.format(RobotoolsShelfInitializeCmd.kPluginCmdName))
 
 
 def bootstrap():
@@ -83,6 +88,32 @@ def bootstrap():
         hotkey_manager.init_hotkeys()
         hotkey_manager.export_set()
 
+    requirements = install_requirements()
+    logging.info('>>>> Requirements installed: {}'.format(', '.join(requirements)))
+
+
+def install_requirements():
+    """
+    Install requirements to the site-packages directory
+    @return:
+    """
+    if not SITE_PACKAGES.exists():
+        os.mkdir(SITE_PACKAGES)
+
+    cmd = '{} -m pip install -r {} -t {} --upgrade'.format(MAYA_INTERPRETER_PATH, REQUIREMENTS, SITE_PACKAGES)
+    os.system(cmd)
+
+    return [x.strip() for x in open(REQUIREMENTS, 'r').readlines()]
+
+
+def uninstall_requirements():
+    """
+    Uninstall requirements and delete site-packages directory
+    """
+    cmd = '{} -m pip uninstall -r {}'.format(MAYA_INTERPRETER_PATH, REQUIREMENTS)
+    os.system(cmd)
+    shutil.rmtree(SITE_PACKAGES)
+
 
 def teardown():
     """
@@ -94,4 +125,5 @@ def teardown():
     logging.info('>>>> Removing Robotools Shelf')
     robotools_utils.RobotoolsHotkeyManager().delete_set()
     logging.info('>>>> Deleting Robotools Hotkeys')
-
+    uninstall_requirements()
+    logging.info('>>>> Uninstalling packages')
