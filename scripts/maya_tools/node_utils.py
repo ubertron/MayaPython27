@@ -4,9 +4,10 @@ from maya_tools.maya_enums import ComponentType
 
 
 class State:
-    """Query and restore selection/component mode"""
-
     def __init__(self):
+        """
+        Query and restore selection/component mode
+        """
         self.component_mode = get_component_mode()
         self.selection = pm.ls(sl=True)
         if self.object_mode:
@@ -41,6 +42,10 @@ class State:
 
 
 def get_component_mode():
+    """
+    Query the component mode
+    @return:
+    """
     if pm.selectMode(query=True, object=True):
         return ComponentType.object
     elif pm.selectType(query=True, vertex=True):
@@ -56,6 +61,10 @@ def get_component_mode():
 
 
 def set_component_mode(component_type=ComponentType.object):
+    """
+    Set component mode
+    @param component_type:
+    """
     if component_type == ComponentType.object:
         pm.selectMode(object=True)
     else:
@@ -73,6 +82,13 @@ def set_component_mode(component_type=ComponentType.object):
 
 
 def select_components(transform, components, component_type=ComponentType.face, hilite=True):
+    """
+    Select geometry components
+    @param transform:
+    @param components:
+    @param component_type:
+    @param hilite:
+    """
     state = State()
 
     if component_type == ComponentType.vertex:
@@ -90,3 +106,46 @@ def select_components(transform, components, component_type=ComponentType.face, 
         pm.hilite(transform)
     else:
         state.restore()
+
+
+def delete_history(nodes=None):
+    """
+    Delete construction history
+    @param nodes:
+    """
+    state = State()
+    set_component_mode(ComponentType.object)
+    pm.delete(pm.ls(nodes, tr=True) if nodes else pm.ls(sl=True, tr=True), constructionHistory=True)
+    state.restore()
+
+
+def freeze_transformations(nodes=None):
+    """
+    Freeze transformations on supplied nodes
+    @param nodes:
+    """
+    for node in list(nodes) if nodes else pm.ls(sl=True, tr=True):
+        pm.makeIdentity(node, apply=True, translate=True, rotate=True, scale=True)
+
+
+def reset_pivot(nodes=None):
+    """
+    Fix transformations on the pivot so that it is relative to the origin
+    @param nodes:
+    """
+    for item in pm.ls(nodes, tr=True) if nodes else pm.ls(sl=True, tr=True):
+        pivot_node = pm.xform(item, query=True, worldSpace=True, rotatePivot=True)
+        pm.xform(item, relative=True, translation=[-i for i in pivot_node])
+        pm.makeIdentity(item, apply=True, translate=True)
+        pm.xform(item, translation=pivot_node)
+
+
+def super_reset(nodes=None):
+    """
+    Reset transformations, reset pivot and delete construction history
+    @param nodes:
+    """
+    nodes = pm.ls(nodes, tr=True) if nodes else pm.ls(sl=True, tr=True)
+    freeze_transformations(nodes)
+    reset_pivot(nodes)
+    delete_history(nodes)

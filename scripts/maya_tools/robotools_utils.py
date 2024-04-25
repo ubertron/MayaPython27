@@ -1,5 +1,6 @@
 # Version 1.0 - initial release
 # Version 1.1 - removed local character import script, put invocation in the command
+# Version 1.2 - added labels, tinted the separator and set button spacing
 
 import pymel.core as pm
 import logging
@@ -14,7 +15,7 @@ from core_tools import PROJECT_ROOT
 ROBOTOOLS_TITLE = 'RobotoolsHotkeys'
 ROBOTOOLS_HOTKEYS = PROJECT_ROOT.joinpath('scripts', 'startup', '{}.mhk'.format(ROBOTOOLS_TITLE))
 ROBOTOOLS_SHELF_NAME = 'Robotools'
-ROBOTOOLS_SHELF_VERSION = '1.1'
+ROBOTOOLS_SHELF_VERSION = '1.2'
 ROBOTOOLS_SHELF_PLUG_IN = 'robotools_shelf'
 ROBOTOOLS_SHELF_PLUG_IN_PATH = str(pm.pluginInfo(ROBOTOOLS_SHELF_PLUG_IN, query=True, path=True))
 
@@ -42,20 +43,27 @@ def setup_robotools_shelf():
     merge_vertices = 'from maya_tools.geometry_utils import merge_vertices\nmerge_vertices'
     select_triangles = 'from maya_tools import geometry_utils; geometry_utils.get_triangular_faces(select=True)'
     select_ngons = 'from maya_tools import geometry_utils; geometry_utils.get_ngons(select=True)'
+    super_reset = 'from maya_tools import node_utils; node_utils.super_reset()'
 
+    sm.add_label('Robotools v{}'.format(ROBOTOOLS_SHELF_VERSION), bold=True)
     sm.add_shelf_button(label='About Robotools', icon=robonobo_icon, command=message_script(version_info))
     sm.add_separator()
+    sm.add_label('Characters')
     sm.add_shelf_button(label='Import Base Male', icon=icon_path('base_male.png'), command=base_male_cmd)
     sm.add_shelf_button(label='Load Base Male', icon=script_icon, command=load_base_male, overlay_label='loadM')
     sm.add_shelf_button(label='Import Base Female', icon=icon_path('base_female.png'), command=base_female_cmd)
     sm.add_shelf_button(label='Load Base Female', icon=script_icon, command=load_base_female, overlay_label='loadF')
     sm.add_separator()
+    sm.add_label('Geometry')
     sm.add_shelf_button(label='Slice', icon=icon_path('slice.png'), command=slice_cmd)
     sm.add_shelf_button(label='Mirror', icon=icon_path('mirror.png'), command=mirror_cmd)
     sm.add_shelf_button(label='Quadrangulate', overlay_label='Quad', icon=script_icon, command=quadrangulate)
     sm.add_shelf_button(label='Merge Vertices', overlay_label='Merge', icon=script_icon, command=merge_vertices)
     sm.add_shelf_button(label='Select Triangles', overlay_label='Tris', icon=script_icon, command=select_triangles)
     sm.add_shelf_button(label='Select Ngons', overlay_label='Ngons', icon=script_icon, command=select_ngons)
+    sm.add_separator()
+    sm.add_label('Nodes')
+    sm.add_shelf_button(label='Super Reset', overlay_label='SpRst', icon=script_icon, command=super_reset)
 
 
 def delete_robotools_shelf():
@@ -63,6 +71,14 @@ def delete_robotools_shelf():
     Remove the shelf
     """
     shelf_manager.ShelfManager(ROBOTOOLS_SHELF_NAME).delete()
+
+
+def rebuild_robotools_shelf():
+    """
+    Delete and rebuild the robotools shelf
+    """
+    delete_robotools_shelf()
+    setup_robotools_shelf()
 
 
 class RobotoolsHotkeyManager(hotkey_utils.HotkeyManager):
