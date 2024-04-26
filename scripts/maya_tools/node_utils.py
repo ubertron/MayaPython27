@@ -149,3 +149,53 @@ def super_reset(nodes=None):
     freeze_transformations(nodes)
     reset_pivot(nodes)
     delete_history(nodes)
+
+
+def pivot_to_base(pm_obj=None, reset=True):
+    """
+    Send pivot to the base of the object
+    @param pm_obj:
+    @param reset:
+    """
+    for item in list(pm_obj) if pm_obj else pm.ls(sl=True, tr=True):
+        bounding_box = pm.exactWorldBoundingBox(item)  # [x_min, y_min, z_min, x_max, y_max, z_max]
+        base = [(bounding_box[0] + bounding_box[3]) / 2, bounding_box[1], (bounding_box[2] + bounding_box[5]) / 2]
+        pm.xform(item, piv=base, ws=True)
+
+    if reset:
+        reset_pivot(pm_obj)
+
+
+def pivot_to_center(pm_obj=None, reset=True):
+    """
+    Send pivot to the center of the object
+    @param pm_obj:
+    @param reset:
+    """
+    for item in list(pm_obj) if pm_obj else pm.ls(sl=True, tr=True):
+        pm.xform(item, centerPivotsOnComponents=True)
+
+    if reset:
+        reset_pivot(pm_obj)
+
+
+def pivot_to_origin(pm_obj=None, reset=True):
+    """
+    Send pivot to the origin
+    @param pm_obj:
+    @param reset:
+    """
+    for item in list(pm_obj) if pm_obj else pm.ls(sl=True, tr=True):
+        pm.xform(item, piv=[0, 0, 0], ws=True)
+
+    if reset:
+        reset_pivot(pm_obj)
+
+
+def move_to_origin(pm_obj=None):
+    """
+    Move objects to the origin
+    @param pm_obj:
+    """
+    for item in list(pm_obj) if pm_obj else pm.ls(sl=True, tr=True):
+        pm.setAttr(item.translate, (0, 0, 0), type='float3')
