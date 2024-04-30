@@ -37,6 +37,7 @@ def setup_robotools_shelf():
     load_base_male = 'from maya_tools.character_utils import load_base_character\nload_base_character("male")'
     base_female_cmd = 'from maya_tools.character_utils import import_base_character\nimport_base_character("female")'
     load_base_female = 'from maya_tools.character_utils import load_base_character\nload_base_character("female")'
+    create_cube = 'import pymel.core as pm; pm.polyCube(w=1, h=1, d=1, sx=1, sy=1, sz=1)'
     slice_cmd = 'from maya_tools.mirror_utils import slice_geometry\nslice_geometry()'
     mirror_cmd = 'from maya_tools.mirror_utils import mirror_geometry\nmirror_geometry()'
     quadrangulate = 'import pymel.core as pm\npm.runtime.Quadrangulate()'
@@ -59,6 +60,7 @@ def setup_robotools_shelf():
     sm.add_shelf_button(label='Load Base Female', icon=script_icon, command=load_base_female, overlay_label='loadF')
     sm.add_separator()
     sm.add_label('Geometry')
+    sm.add_shelf_button(label='Create Cube', overlay_label='Cube', icon=script_icon, command=create_cube)
     sm.add_shelf_button(label='Slice', icon=icon_path('slice.png'), command=slice_cmd)
     sm.add_shelf_button(label='Mirror', icon=icon_path('mirror.png'), command=mirror_cmd)
     sm.add_shelf_button(label='Quadrangulate', overlay_label='Quad', icon=script_icon, command=quadrangulate)
@@ -72,7 +74,6 @@ def setup_robotools_shelf():
     sm.add_shelf_button(label='Pivot To Center', overlay_label='Pv->C', icon=script_icon, command=pivot_center)
     sm.add_shelf_button(label='Pivot To Origin', overlay_label='Pv->O', icon=script_icon, command=pivot_origin)
     sm.add_shelf_button(label='Move To Origin', overlay_label='>Orig', icon=script_icon, command=move_to_origin)
-
 
 
 def delete_robotools_shelf():
