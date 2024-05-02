@@ -1,23 +1,20 @@
 import os
-import sys
-import platform
+import logging
 
-from pymel.core import Path
-
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-REQUIREMENTS = PROJECT_ROOT.joinpath('requirements.txt')
-SITE_PACKAGES = PROJECT_ROOT.joinpath('site-packages')
+logging.basicConfig()
+logging.getLogger().setLevel(logging.INFO)
 
 
-def get_maya_python_interpreter_path():
-    """
-    Get the path to the Maya interpreter
-    @return:
-    """
-    if platform.system() == 'Darwin':
-        return Path(sys.executable).parent.parent.parent.joinpath('Contents', 'bin', 'mayapy')
-    else:
-        return Path(Path(sys.executable), 'maya.exe')
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+REQUIREMENTS = os.path.join(PROJECT_ROOT, 'requirements.txt')
+SITE_PACKAGES = os.path.join(PROJECT_ROOT, 'site-packages')
 
 
-MAYA_INTERPRETER_PATH = get_maya_python_interpreter_path()
+def inspect_path(path_string):
+    logging.info("{}: Exists? {}".format(path_string, os.path.exists(path_string)))
+
+
+if __name__ == '__main__':
+    inspect_path(PROJECT_ROOT)
+    inspect_path(REQUIREMENTS)
+    inspect_path(SITE_PACKAGES)

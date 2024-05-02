@@ -1,2 +1,3 @@
 pyperclip
+PySide2
 Send2Trash

@@ -12,7 +12,8 @@ from pymel.core import Path
 
 import maya_tools.robotools_utils
 
-from core_tools import SITE_PACKAGES, REQUIREMENTS, MAYA_INTERPRETER_PATH
+from core_tools import SITE_PACKAGES, REQUIREMENTS
+from maya_tools import MAYA_INTERPRETER_PATH
 
 DARWIN = 'Darwin'
 PLATFORM_SEPARATOR = ':' if platform.system() == DARWIN else ';'

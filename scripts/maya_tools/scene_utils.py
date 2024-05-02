@@ -43,7 +43,6 @@ def import_model(import_path):
     """
     return pm.importFile(import_path, returnNewNodes=True)
 
-
 def load_scene(file_path, force=True):
     """
     Load a scene in Maya
