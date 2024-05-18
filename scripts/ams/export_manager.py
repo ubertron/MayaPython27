@@ -2,7 +2,11 @@ import os.path
 
 from widgets import generic_widget
 from PySide2.QtWidgets import QSizePolicy, QTabWidget
+
 from core_tools.system_utils import is_using_maya_python
+from core_tools.enums import AssetType
+from ams.asset import Asset
+from core_tools.system_paths import ENGINE_ROOT
 
 
 if is_using_maya_python():
@@ -11,12 +15,10 @@ else:
     from pathlib import Path
 
 HOME_DIR = os.path.expanduser('~')
-PROJECT_ROOT = Path(HOME_DIR).joinpath('Dropbox/Projects/Unity/AnimationManager')
-MAYA_EXTENSION = '.mb'
 
 
 class ExportManager(generic_widget.GenericWidget):
-    def __init__(self, project_root=PROJECT_ROOT):
+    def __init__(self, engine_root=ENGINE_ROOT):
         super(ExportManager, self).__init__(title='Export Manager')
         button_bar = self.add_widget(generic_widget.GenericWidget(vertical=False))
         button_bar.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
@@ -30,15 +32,15 @@ class ExportManager(generic_widget.GenericWidget):
         self.tab_bar.addTab(self.character_exporter, 'Characters')
         self.tab_bar.addTab(self.environment_exporter, 'Environments')
 
-        self.project_root = project_root
+        self.engine_root = engine_root
         self.resize(480, 240)
 
     @property
-    def project_root(self):
+    def engine_root(self):
         return self._project_root
 
-    @project_root.setter
-    def project_root(self, path):
+    @engine_root.setter
+    def engine_root(self, path):
         self._project_root = path
         self.project_label.setText("Project: {}".format(os.path.basename(path)))
 
@@ -57,44 +59,44 @@ class CharacterExporter(generic_widget.GenericWidget):
 
     @property
     def project_root(self):
-        return PROJECT_ROOT if self.parent_widget is None else self.parent_widget.project_root
+        return ENGINE_ROOT if self.parent_widget is None else self.parent_widget.engine_root
 
     @property
     def source_art(self):
-        return PROJECT_ROOT.joinpath('SourceArt')
+        return ENGINE_ROOT.joinpath('SourceArt')
+
+    @property
+    def character_folder(self):
+        return self.source_art.joinpath('Characters')
 
     @property
     def exports(self):
-        return PROJECT_ROOT.joinpath('Assets/Models')
+        return ENGINE_ROOT.joinpath('Assets/Models')
 
     @property
-    def asset_folders(self):
+    def character_asset_folders(self):
         if is_using_maya_python():
-            return [x for x in os.listdir(self.source_art)
-                    if os.path.isdir(os.path.join(self.source_art, x))]
+            result = [x for x in os.listdir(self.character_folder)
+                      if os.path.isdir(os.path.join(self.character_folder, x))]
         else:
-            return [x.name for x in self.source_art.iterdir() if x.is_dir()]
+            result = [x.name for x in self.character_folder.iterdir() if x.is_dir()]
 
-    def check_asset_folder(self, folder_name):
-        abs_path = self.source_art.joinpath(folder_name)
+        result.sort(key=lambda x: x.lower())
 
-        if is_using_maya_python():
-            scene_files = [x for x in os.listdir(abs_path) if os.path.isfile(os.path.join(abs_path, x))]
-        else:
-            scene_files = [x.name for x in abs_path.iterdir() if x.is_file and x.suffix == MAYA_EXTENSION]
-
-        print(scene_files)
+        return [x for x in result if not x.startswith('_')]
 
     def collect_asset_data(self):
-        characters = {}
-
+        characters = []
+        print(self.character_asset_folders)
         # browse all the scene folders for Maya files and export data
-        for folder in self.asset_folders:
-            self.check_asset_folder(folder)
+        for folder in self.character_asset_folders:
+            asset = Asset(source_folder=self.character_folder.joinpath(folder), asset_type=AssetType.character)
+            if asset.scene_file_exists:
+                characters.append(asset)
 
         # check the export folder
-        info = 'Project root: {}\nAsset folders:\n'.format(self.project_root)
-        info += '\n'.join(self.asset_folders)
+        info = 'Characters ({} found):\n'.format(len(characters))
+        info += '\n'.join(str(x) for x in characters)
         self.label.setText(info)
 
 
@@ -109,7 +111,7 @@ if __name__ == '__main__':
     from PySide2.QtWidgets import QApplication
 
     app = QApplication()
-    export_manager = ExportManager(PROJECT_ROOT)
+    export_manager = ExportManager(ENGINE_ROOT)
     export_manager.show()
     app.exec_()
 

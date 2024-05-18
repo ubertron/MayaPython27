@@ -1,53 +1,57 @@
 import os
-import sys
-import subprocess
-import platform
 
-from maya_tools import MAYA_REQUIREMENTS, SITE_PACKAGES
-from maya import mel
+# from dotenv import load_dotenv, set_key   # cannot install via mayapy Python 2.7.11
+from core_tools.system_utils import is_using_maya_python
+
+if is_using_maya_python():
+    from pymel.core import Path
+else:
+    from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+ENV_PATH = PROJECT_ROOT.joinpath('.env')
+
+if not ENV_PATH.exists():
+    ENV_PATH.touch(mode=0o600, exist_ok=False)
 
 
-def get_maya_python_interpreter_path():
-    return os.path.join(os.path.dirname(sys.executable), 'mayapy.exe')
+def env_file_to_dict():
+    return {x.split('=')[0]: x.split('=')[1] for x in open(str(ENV_PATH), "r").readlines()}
 
 
-MAYA_INTERPRETER_PATH = get_maya_python_interpreter_path()
-PLATFORM_SEPARATOR = ':' if platform.system() == 'Darwin' else ';'
-
-
-def install_maya_requirements(output=True):
+def get_env_value(key):
     """
-    pip installs Maya modules from a requirements file
-    n.b. pip install won't work with Python 2.7 because the wheels have been discontinued
-    @param output:
-    """
-    cmds = [MAYA_INTERPRETER_PATH, '-m', 'pip', 'install', '-r', MAYA_REQUIREMENTS, '-t',
-            SITE_PACKAGES]
-
-    CREATE_NO_WINDOW = 0x08000000
-    subprocess.run(cmds, text=True, creationflags=CREATE_NO_WINDOW)
-    requirements = [x.strip() for x in open(MAYA_REQUIREMENTS, 'r').readlines()]
-
-    if output:
-        requirements_string = ", ".join(x for x in requirements)
-        logging.info('Requirements installed: %s' % requirements_string)
-    return requirements
-
-
-def get_environment_variable(variable_name):
-    """
-    Get a list of the values for an environment variable
-    @param variable_name:
+    Get environment variable from local .env
+    @param key:
     @return:
     """
-    result = mel.eval('getenv "%s"' % variable_name).split(PLATFORM_SEPARATOR)
-    return [x for x in result if x != '']
+    # load_dotenv(ENV_PATH)
+    #
+    # return os.getenv(key)
+
+    return env_file_to_dict().get(key).strip().replace("'", "")
 
 
-def set_environment_variable(variable_name, value_list):
+def set_env_value(key, value):
     """
-    Set an environment variable with a list of values
-    @param variable_name:
-    @param value_list:
+    Set environment variable to local .env
+    @param key:
+    @param value:
     """
-    mel.eval('putenv "%s" "%s"' % (variable_name, PLATFORM_SEPARATOR.join(value_list)))
+    # set_key(dotenv_path=ENV_PATH, key_to_set=key, value_to_set=str(value))
+
+    env_dict = env_file_to_dict()
+    env_dict[key] = value
+
+    with open(str(ENV_PATH), 'w') as f:
+        for k, v in env_dict.items():
+            f.write('{}=\'{}\'\n'.format(k, v))
+
+
+if __name__ == '__main__':
+    engine_key = 'ENGINE_ROOT'
+    # engine_root = Path.home().joinpath('Dropbox/Projects/Unity/AnimationManager')
+    _result = get_env_value('ENGINE_ROOT')
+    print(_result)
+    # set_env_value(key=engine_key, value=engine_root)
+

@@ -1,19 +1,11 @@
 import os
 import shutil
-import sys
 import maya.api.OpenMaya as om
 import logging
-import pymel.util
 import platform
-import subprocess
 
-from maya import mel
-from pymel.core import Path
-
-import maya_tools.robotools_utils
-
-from core_tools import SITE_PACKAGES, REQUIREMENTS
-from maya_tools import MAYA_INTERPRETER_PATH
+# from core_tools.system_paths import SITE_PACKAGES, REQUIREMENTS
+from maya_tools import MAYA_INTERPRETER_PATH, SITE_PACKAGES, REQUIREMENTS
 
 DARWIN = 'Darwin'
 PLATFORM_SEPARATOR = ':' if platform.system() == DARWIN else ';'
@@ -76,21 +68,21 @@ def bootstrap():
     """
     Set up Robotools
     """
+    requirements = install_requirements()
+    logging.info('>>> Requirements installed: {}'.format(', '.join(requirements)))
+
     from maya_tools import robotools_utils
 
     robotools_utils.setup_robotools_shelf()
     hotkey_manager = robotools_utils.RobotoolsHotkeyManager()
 
     if hotkey_manager.exists:
-        logging.info('>>>> Hotkeys imported')
+        logging.info('>>> Hotkeys imported')
         hotkey_manager.import_set()
     else:
-        logging.info('>>>> Hotkey preferences file created')
+        logging.info('>>> Hotkey preferences file created')
         hotkey_manager.init_hotkeys()
         hotkey_manager.export_set()
-
-    requirements = install_requirements()
-    logging.info('>>>> Requirements installed: {}'.format(', '.join(requirements)))
 
 
 def install_requirements():
@@ -102,6 +94,7 @@ def install_requirements():
         os.mkdir(SITE_PACKAGES)
 
     cmd = '{} -m pip install -r {} -t {} --upgrade'.format(MAYA_INTERPRETER_PATH, REQUIREMENTS, SITE_PACKAGES)
+    print('Terminal command: {}'.format(cmd))
     os.system(cmd)
 
     return [x.strip() for x in open(REQUIREMENTS, 'r').readlines()]
@@ -120,11 +113,11 @@ def teardown():
     """
     Reverse the bootstrapping to unload the plug-in
     """
-    from maya_tools import shelf_manager, robotools_utils
+    from maya_tools import robotools_utils
 
     robotools_utils.delete_robotools_shelf()
-    logging.info('>>>> Removing Robotools Shelf')
+    logging.info('>>> Removing Robotools Shelf')
     robotools_utils.RobotoolsHotkeyManager().delete_set()
-    logging.info('>>>> Deleting Robotools Hotkeys')
-    uninstall_requirements()
-    logging.info('>>>> Uninstalling packages')
+    logging.info('>>> Deleting Robotools Hotkeys')
+    # uninstall_requirements()
+    # logging.info('>>> Uninstalling packages')

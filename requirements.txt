@@ -1,3 +1,4 @@
 pyperclip
 PySide2
+python-dotenv
 Send2Trash

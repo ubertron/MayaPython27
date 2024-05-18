@@ -26,6 +26,7 @@ class FileExtension:
     py = '.py'
     substance = '.substance'
     tga = '.tga'
+    unity = '.unity'
     uasset = '.uasset'
     ztool = '.ztool'
 
@@ -34,3 +35,11 @@ class Gender:
     male = 'male'
     female = 'female'
     other = 'other'
+
+
+class AssetType:
+    character = 'character'
+    environment = 'environment'
+    fx = 'fx'
+    prop = 'prop'
+    vehicle = 'vehicle'

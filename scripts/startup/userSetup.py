@@ -3,8 +3,8 @@ import pymel.core as pm
 
 
 def main():
-    logging.info('>>>> Git userSetup.py script')
-    logging.info('>>>> Installing plug-ins')
+    logging.info('>>> Git userSetup.py script')
+    logging.info('>>> Installing plug-ins')
     plug_ins = ['robotools_shelf']
 
     for plug_in in plug_ins:

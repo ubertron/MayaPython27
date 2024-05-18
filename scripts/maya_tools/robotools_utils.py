@@ -5,12 +5,10 @@
 import pymel.core as pm
 import logging
 
-from pymel.core.system import Path
-
-from maya_tools import icon_path, shelf_manager, hotkey_utils
+from core_tools.system_paths import PROJECT_ROOT, icon_path
+from maya_tools import hotkey_utils
+from maya_tools.utilities import shelf_manager
 from maya_tools.scene_utils import message_script
-
-from core_tools import PROJECT_ROOT
 
 ROBOTOOLS_TITLE = 'RobotoolsHotkeys'
 ROBOTOOLS_HOTKEYS = PROJECT_ROOT.joinpath('scripts', 'startup', '{}.mhk'.format(ROBOTOOLS_TITLE))
@@ -24,7 +22,7 @@ def setup_robotools_shelf():
     """
     Sets up the Robotools shelf
     """
-    logging.info('>>>> Loading Robotools Shelf')
+    logging.info('>>> Loading Robotools Shelf')
     sm = shelf_manager.ShelfManager(ROBOTOOLS_SHELF_NAME)
     sm.delete()
     sm.create(select=True)
